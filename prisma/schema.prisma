@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique @db.VarChar(255)
+  firstName String    @db.VarChar(50)
+  lastName  String    @db.VarChar(50)
+  password  String?   @db.VarChar(100)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  camps     Camp[]
+  comments  Comment[]
+}
+
+model Camp {
+  id        Int       @id @default(autoincrement())
+  title     String    @db.VarChar(100)
+  content   String    @db.Text
+  image     String    @db.VarChar(100)
+  rating    Int       @db.TinyInt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  author    User?     @relation(fields: [authorId], references: [id])
+  authorId  Int?
+  comments  Comment[]
+
+  @@index([authorId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  body      String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner     User?    @relation(fields: [ownerId], references: [id])
+  ownerId   Int?
+  camp      Camp?    @relation(fields: [campId], references: [id], onDelete: Cascade)
+  campId    Int?
+
+  @@index([ownerId])
+  @@index([campId])
+}

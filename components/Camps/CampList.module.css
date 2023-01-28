@@ -1,0 +1,18 @@
+.campListItem:hover {
+  cursor: pointer;
+}
+
+/* .link {
+  text-decoration: inherit;
+  color: inherit;
+} */
+
+.link,
+.link:hover,
+.link:visited,
+.link:focus,
+.link:active {
+  text-decoration: none;
+  color: inherit;
+  outline: 0;
+}

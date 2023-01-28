@@ -1,0 +1,68 @@
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import { signIn } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/router";
+
+type Query = string | undefined;
+
+const LoginPage = () => {
+  const router = useRouter();
+
+  const callbackUrl: string = Array.isArray(router.query.callbackUrl)
+    ? router.query.callbackUrl[0]
+    : router.query.callbackUrl ?? "/";
+
+  /**
+   *
+   * @param {Event} e
+   */
+  async function handleLogin(e) {
+    e.preventDefault();
+    try {
+      const { ok, error, url } = await signIn("credentials", {
+        redirect: false,
+        email: "olivier@mail.com",
+        password: "password",
+      });
+      console.log(`ok: ${ok}, error: ${error}, url: ${url}`);
+      if (url !== null) {
+        toast.success("Successfully logged in. Redirecting ...");
+        setTimeout(() => {
+          router.replace(callbackUrl);
+        }, 1000);
+      } else if (error) {
+        toast.error(error);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong. Pleast contact support.");
+    }
+  }
+
+  return (
+    <Form
+      className="mx-auto"
+      style={{ maxWidth: "640px" }}
+      onSubmit={handleLogin}
+    >
+      <Toaster position="top-center" reverseOrder={true} />
+      <h1 className="mt-3 mb-3">Login</h1>
+      <Form.Group controlId="formBasicEmail">
+        <Form.Label>Email address</Form.Label>
+        <Form.Control type="email" placeholder="Enter email" />
+      </Form.Group>
+      <Form.Group controlId="formBasicPassword">
+        <Form.Label>Password</Form.Label>
+        <Form.Control type="password" placeholder="Password" />
+      </Form.Group>
+      <Button variant="light" type="submit" className="mt-3">
+        Login
+      </Button>
+      <br />
+      <br />
+    </Form>
+  );
+};
+
+export default LoginPage;
